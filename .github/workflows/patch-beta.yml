@@ -1,0 +1,41 @@
+name: Patch beta daily queue
+on:
+  push:
+    paths:
+      - '.github/workflows/patch-beta.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch beta
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index-1.html')
+          t = p.read_text(encoding='utf-8')
+          t = t.replace('β v0.8', 'β v0.81')
+          t = t.replace("KEY='shiritoring_beta_v07'", "KEY='shiritoring_beta_v081'")
+          t = t.replace('utcDay(2026,9,7)+1', 'utcDay(2026,9,8)+1')
+          old = """const DAILY_RESERVED_IDS=[
+            'C002','C003','C004','C005','C006','C007','C008','C009','C010','C011',
+            'C012','C013','C014','C015','C016','C017','C018','C019','C020'
+          ];"""
+          new = """const DAILY_RESERVED_IDS=[
+            'C002','C005','C006','C009','C011','C012','C014','C016','C018',
+            'C003','C004','C007','C008','C010','C013','C015','C017','C019','C020'
+          ];"""
+          if old not in t:
+              raise SystemExit('DAILY queue block not found')
+          t = t.replace(old, new)
+          p.write_text(t, encoding='utf-8')
+          PY
+      - name: Commit patch
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add index-1.html
+          git commit -m "Make beta daily queue first-seen for tester"
+          git push
