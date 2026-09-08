@@ -1,0 +1,10 @@
+{
+  "name": "しりとリング β",
+  "short_name": "しりとリング",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f7f5ef",
+  "theme_color": "#f7f5ef",
+  "lang": "ja",
+  "icons": []
+}
